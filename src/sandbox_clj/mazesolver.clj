@@ -95,7 +95,7 @@
          (->> (children head)
               (filter #(not (contains? acc %)))))))
 
-(defn dfs [graph success-fn head]
+(defn dfs-3 [graph success-fn head]
   (loop [stack (into [] (children graph head)) explored #{head} ]
     (let [n (peek stack)]
       (if (or  (success-fn n)
@@ -106,6 +106,27 @@
                                     (children graph n)))
          (conj explored n)
          )))))
+
+(defn dfs [graph success-fn start]
+  (let [dfs-fn (fn [visited to-visit path]
+                 (let [w (first to-visit)]
+                   (conj visited w)
+                   (cond
+                    (success-fn w) (conj path w) ;;eventually start will be either end of maze (success!)
+                    (empty? to-visit) nil        ;; or dead end with no edges
+                    :else
+                    ;;TODO start here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    ;; need to loop over all to-visit call them recursively and find the one with solution..
+                    (remove
+                     nil?
+                     (map
+                      (dfs-fn
+                       visited
+                       (remove #(contains? visited %) (children graph %))
+                       (conj path %))
+                      (rest to-visit))))
+                   ))]
+    (dfs-fn #{start} (children graph start) [])))
 
 
 (dfs adj-matrix #(= (get-value adj-matrix %) "*") [1 1])
@@ -128,7 +149,15 @@
 
 (println (print-path adj-matrix '([1 1] [2 1] [2 2] [2 3] [3 3])))
 
+(defn solve [graph dfs-fn]
+  (->> (dfs-fn graph #(= (get-value graph %) "*") [1 1])
+       (print-path graph)
+       println))
 
-(->> (dfs adj-matrix #(= (get-value adj-matrix %) "*") [1 1])
-     (print-path adj-matrix)
-     println)
+(solve adj-matrix  dfs)
+
+
+(comment
+  (->> (dfs adj-matrix #(= (get-value adj-matrix %) "*") [1 1])
+       (print-path adj-matrix)
+       println))

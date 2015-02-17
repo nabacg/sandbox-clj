@@ -44,7 +44,7 @@
 
                                         ;>> 24
 
-( (wrap-namespace-in-lambda
+((wrap-namespace-in-lambda
                               ((def a 10)
                                (defn b [c d] (* c d))
                                (defn -main [board] (+ a (b 10 board)))))  100)

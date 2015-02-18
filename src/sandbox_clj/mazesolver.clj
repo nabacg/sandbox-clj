@@ -91,7 +91,7 @@
 (defn dfs-2 [graph success-fn acc head]
   (if (success-fn head)
     (conj acc head)
-    (map (partial dfs graph success-fn (conj acc head))
+    (map (partial dfs-2 graph success-fn (conj acc head))
          (->> (children head)
               (filter #(not (contains? acc %)))))))
 
